@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3MTT School Result Portal</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
+        h2 { color: #008751; text-align: center; }
+        input, button { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { background-color: #008751; color: white; font-weight: bold; cursor: pointer; border: none; }
+        button:hover { background-color: #005f38; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #008751; color: white; }
+        .error { color: red; margin-top: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>3MTT School Result Portal</h2>
+        <p>Shigar da Student ID ɗinka domin duba sakamako (Try: STU101):</p>
+        <input type="text" id="studentId" placeholder="Misali: STU101">
+        <button onclick="checkResult()">Duba Sakamako (Check Result)</button>
+        
+        <div id="resultArea"></div>
+    </div>
+
+    <script>
+        async function checkResult() {
+            const id = document.getElementById('studentId').value;
+            const resultArea = document.getElementById('resultArea');
+            resultArea.innerHTML = '';
+
+            if(!id) {
+                resultArea.innerHTML = '<p class="error">Da fatan za a shigar da Student ID</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/result', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ studentId: id })
+                });
+
+                const data = await response.json();
+
+                if(!response.ok) {
+                    resultArea.innerHTML = `<p class="error">${data.message}</p>`;
+                    return;
+                }
+
+                let rows = data.results.map(r => `<tr><td>${r.subject}</td><td>${r.score}</td></tr>`).join('');
+                resultArea.innerHTML = `
+                    <h3>Suna: ${data.name}</h3>
+                    <p>ID: ${data.id}</p>
+                    <table>
+                        <tr><th>Subject</th><th>Score</th></tr>
+                        ${rows}
+                    </table>
+                `;
+            } catch (error) {
+                resultArea.innerHTML = '<p class="error">An samu matsala wajen sadarwa</p>';
+            }
+        }
+    </script>
+</body>
+</html>
