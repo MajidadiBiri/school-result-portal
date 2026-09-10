@@ -5,66 +5,130 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>3MTT School Result Portal</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
-        h2 { color: #008751; text-align: center; }
-        input, button { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        button { background-color: #008751; color: white; font-weight: bold; cursor: pointer; border: none; }
-        button:hover { background-color: #005f38; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #008751; color: white; }
-        .error { color: red; margin-top: 10px; text-align: center; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+        }
+        h2 {
+            color: #007a43;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #555555;
+            font-size: 14px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+            text-align: center;
+        }
+        button {
+            width: 100%;
+            background-color: #007a43;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #005c32;
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #eef7f2;
+            text-align: left;
+            display: none;
+        }
+        .result-box h3 {
+            margin-top: 0;
+            color: #007a43;
+        }
+        .error {
+            color: red;
+            margin-top: 15px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>3MTT School Result Portal</h2>
-        <p>Shigar da Student ID ɗinka domin duba sakamako (Try: STU101):</p>
-        <input type="text" id="studentId" placeholder="Misali: STU101">
-        <button onclick="checkResult()">Duba Sakamako (Check Result)</button>
-        
-        <div id="resultArea"></div>
+
+<div class="container">
+    <h2>3MTT School Result Portal</h2>
+    <p>Shigar da Student ID dinka domin duba sakamako (Try: STU101):</p>
+    
+    <input type="text" id="studentId" placeholder="STU101">
+    <button onclick="checkResult()">Duba Sakamako (Check Result)</button>
+
+    <div id="errorMsg" class="error"></div>
+
+    <div id="resultBox" class="result-box">
+        <h3 id="studentName"></h3>
+        <p><strong>Student ID:</strong> <span id="displayId"></span></p>
+        <hr>
+        <p><strong>Mathematics:</strong> <span id="mathScore"></span>%</p>
+        <p><strong>English:</strong> <span id="englishScore"></span>%</p>
+        <p><strong>Science:</strong> <span id="scienceScore"></span>%</p>
     </div>
+</div>
 
-    <script>
-        async function checkResult() {
-            const id = document.getElementById('studentId').value;
-            const resultArea = document.getElementById('resultArea');
-            resultArea.innerHTML = '';
+<script>
+    async function checkResult() {
+        const studentId = document.getElementById('studentId').value.trim();
+        const errorMsg = document.getElementById('errorMsg');
+        const resultBox = document.getElementById('resultBox');
 
-            if(!id) {
-                resultArea.innerHTML = '<p class="error">Da fatan za a shigar da Student ID</p>';
-                return;
-            }
+        errorMsg.innerText = '';
+        resultBox.style.display = 'none';
 
-            try {
-                const response = await fetch('/api/result', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ studentId: id })
-                });
-
-                const data = await response.json();
-
-                if(!response.ok) {
-                    resultArea.innerHTML = `<p class="error">${data.message}</p>`;
-                    return;
-                }
-
-                let rows = data.results.map(r => `<tr><td>${r.subject}</td><td>${r.score}</td></tr>`).join('');
-                resultArea.innerHTML = `
-                    <h3>Suna: ${data.name}</h3>
-                    <p>ID: ${data.id}</p>
-                    <table>
-                        <tr><th>Subject</th><th>Score</th></tr>
-                        ${rows}
-                    </table>
-                `;
-            } catch (error) {
-                resultArea.innerHTML = '<p class="error">An samu matsala wajen sadarwa</p>';
-            }
+        if (!studentId) {
+            errorMsg.innerText = 'Tabbatar ka shigar da Student ID!';
+            return;
         }
-    </script>
+
+        try {
+            const response = await fetch(`/api/result/${studentId}`);
+            if (!response.ok) {
+                throw new Error('Sakamako ba a same shi ba');
+            }
+            const data = await response.json();
+
+            document.getElementById('studentName').innerText = `Sakamakon: ${data.name}`;
+            document.getElementById('displayId').innerText = data.student_id;
+            document.getElementById('mathScore').innerText = data.math;
+            document.getElementById('englishScore').innerText = data.english;
+            document.getElementById('scienceScore').innerText = data.science;
+
+            resultBox.style.display = 'block';
+        } catch (err) {
+            errorMsg.innerText = 'An samu matsala wajen sadarwa ko babu wannan ID din';
+        }
+    }
+</script>
+
 </body>
 </html>
