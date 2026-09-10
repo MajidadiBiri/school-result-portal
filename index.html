@@ -1,131 +1,244 @@
 <!DOCTYPE html>
-<html lang="ha">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3MTT School Result Portal</title>
+    <title>Majidadi - Student Result Portal</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            margin: 0;
-            padding: 20px;
         }
-        .container {
+        .portal-card {
             background-color: #ffffff;
-            padding: 30px;
             border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            max-width: 450px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
             width: 100%;
-            text-align: center;
+            max-width: 550px;
+            padding: 30px;
+            box-sizing: border-box;
         }
-        h2 {
-            color: #007a43;
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #007a43;
+            padding-bottom: 15px;
             margin-bottom: 20px;
         }
-        p {
-            color: #555555;
+        .header h1 {
+            color: #007a43;
+            margin: 0;
+            font-size: 24px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .header p {
+            color: #666;
+            margin: 5px 0 0 0;
+            font-size: 13px;
+        }
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-box input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #cccccc;
+            border-radius: 6px;
+            font-size: 15px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        .search-box button {
+            background-color: #007a43;
+            color: #ffffff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+        }
+        .search-box button:hover {
+            background-color: #005c32;
+        }
+        .error {
+            color: #d9534f;
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .result-container {
+            display: none;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #fafafa;
+        }
+        .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #007a43;
+        }
+        .student-info p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            background: #ffffff;
+        }
+        table th, table td {
+            border: 1px solid #dddddd;
+            padding: 10px;
+            text-align: left;
             font-size: 14px;
         }
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            margin: 15px 0;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 16px;
-            text-align: center;
-        }
-        button {
-            width: 100%;
+        table th {
             background-color: #007a43;
             color: white;
-            padding: 12px;
+        }
+        .summary-box {
+            text-align: right;
+            font-weight: bold;
+            font-size: 15px;
+            color: #007a43;
+            margin-bottom: 15px;
+        }
+        .print-btn {
+            width: 100%;
+            background-color: #333333;
+            color: white;
+            padding: 10px;
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        button:hover {
-            background-color: #005c32;
-        }
-        .result-box {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #eef7f2;
-            text-align: left;
-            display: none;
-        }
-        .result-box h3 {
-            margin-top: 0;
-            color: #007a43;
-        }
-        .error {
-            color: red;
-            margin-top: 15px;
             font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>3MTT School Result Portal</h2>
-    <p>Shigar da Student ID dinka domin duba sakamako (Try: STU101):</p>
-    
-    <input type="text" id="studentId" placeholder="STU101">
-    <button onclick="checkResult()">Duba Sakamako (Check Result)</button>
+<div class="portal-card">
+    <div class="header">
+        <h1>Majidadi</h1>
+        <p>Official Student Result Portal (Session: 2025/2026)</p>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="studentId" placeholder="Enter Student ID (e.g. STU101)">
+        <button onclick="checkResult()">Check Result</button>
+    </div>
 
     <div id="errorMsg" class="error"></div>
 
-    <div id="resultBox" class="result-box">
-        <h3 id="studentName"></h3>
-        <p><strong>Student ID:</strong> <span id="displayId"></span></p>
-        <hr>
-        <p><strong>Mathematics:</strong> <span id="mathScore"></span>%</p>
-        <p><strong>English:</strong> <span id="englishScore"></span>%</p>
-        <p><strong>Science:</strong> <span id="scienceScore"></span>%</p>
+    <div id="resultContainer" class="result-container">
+        <div class="student-info">
+            <p><strong>Name:</strong> <span id="resName"></span></p>
+            <p><strong>Student ID:</strong> <span id="resId"></span></p>
+            <p><strong>Class:</strong> <span id="resClass"></span></p>
+            <p><strong>Gender:</strong> <span id="resGender"></span></p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Score (%)</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Mathematics</td>
+                    <td id="mathScore"></td>
+                    <td id="mathGrade"></td>
+                </tr>
+                <tr>
+                    <td>English Language</td>
+                    <td id="englishScore"></td>
+                    <td id="englishGrade"></td>
+                </tr>
+                <tr>
+                    <td>Basic Science</td>
+                    <td id="scienceScore"></td>
+                    <td id="scienceGrade"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="summary-box">
+            Average Score: <span id="avgScore"></span>% | Final Status: <span id="finalStatus" style="color: #007a43;">PASSED</span>
+        </div>
+
+        <button class="print-btn" onclick="window.print()">Print Result Slip</button>
     </div>
 </div>
 
 <script>
+    function getGrade(score) {
+        if (score >= 80) return 'A (Excellent)';
+        if (score >= 70) return 'B (Very Good)';
+        if (score >= 60) return 'C (Good)';
+        if (score >= 50) return 'D (Pass)';
+        return 'F (Fail)';
+    }
+
     async function checkResult() {
-        const studentId = document.getElementById('studentId').value.trim();
+        const studentId = document.getElementById('studentId').value.trim().toUpperCase();
         const errorMsg = document.getElementById('errorMsg');
-        const resultBox = document.getElementById('resultBox');
+        const resultContainer = document.getElementById('resultContainer');
 
         errorMsg.innerText = '';
-        resultBox.style.display = 'none';
+        resultContainer.style.display = 'none';
 
         if (!studentId) {
-            errorMsg.innerText = 'Tabbatar ka shigar da Student ID!';
+            errorMsg.innerText = 'Please enter a valid Student ID!';
             return;
         }
 
         try {
             const response = await fetch(`/api/result/${studentId}`);
             if (!response.ok) {
-                throw new Error('Sakamako ba a same shi ba');
+                throw new Error('Student record not found');
             }
             const data = await response.json();
 
-            document.getElementById('studentName').innerText = `Sakamakon: ${data.name}`;
-            document.getElementById('displayId').innerText = data.student_id;
-            document.getElementById('mathScore').innerText = data.math;
-            document.getElementById('englishScore').innerText = data.english;
-            document.getElementById('scienceScore').innerText = data.science;
+            document.getElementById('resName').innerText = data.name;
+            document.getElementById('resId').innerText = data.student_id;
+            document.getElementById('resClass').innerText = data.class;
+            document.getElementById('resGender').innerText = data.gender;
 
-            resultBox.style.display = 'block';
+            document.getElementById('mathScore').innerText = data.math;
+            document.getElementById('mathGrade').innerText = getGrade(data.math);
+
+            document.getElementById('englishScore').innerText = data.english;
+            document.getElementById('englishGrade').innerText = getGrade(data.english);
+
+            document.getElementById('scienceScore').innerText = data.science;
+            document.getElementById('scienceGrade').innerText = getGrade(data.science);
+
+            const avg = ((data.math + data.english + data.science) / 3).toFixed(1);
+            document.getElementById('avgScore').innerText = avg;
+
+            resultContainer.style.display = 'block';
         } catch (err) {
-            errorMsg.innerText = 'An samu matsala wajen sadarwa ko babu wannan ID din';
+            errorMsg.innerText = 'No result found for this Student ID. (Try STU101 to STU115)';
         }
     }
 </script>
